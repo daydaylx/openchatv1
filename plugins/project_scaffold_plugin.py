@@ -1,3 +1,5 @@
+# plugins/project_scaffold_plugin.py
+
 from plugin_interface import ChatPlugin
 from PySide6.QtWidgets import QAction, QMessageBox, QFileDialog
 import os
@@ -11,16 +13,15 @@ class ScaffoldAndWritePlugin(ChatPlugin):
 
     def __init__(self, main_window):
         super().__init__(main_window)
-        action = QAction("Struktur & Inhalte anlegen", self.main_window)
+        action = QAction("Projekt aus Chat erstellen...", self.main_window)
         action.triggered.connect(self.run_scaffold_and_write)
 
-        # Finde das "Datei"-Menü und füge die Aktion dort hinzu
-        file_menu = next((m for m in self.main_window.menuBar().actions() if m.text() == "&Datei"), None)
-        if file_menu:
-            file_menu.menu().addAction(action)
+        # --- START: GEÄNDERTER CODE ---
+        if hasattr(self.main_window, 'm_plugins'):
+            self.main_window.m_plugins.addAction(action)
         else:
-            # Fallback, falls das Menü nicht gefunden wird
-            self.main_window.menuBar().addAction(action)
+            self.main_window.menuBar().addMenu("Plugins").addAction(action)
+        # --- ENDE: GEÄNDERTER CODE ---
             
     def extract_structure(self, text):
         """Extrahiert die Struktur aus Markdown-Codeblöcken oder einfachen Listen."""

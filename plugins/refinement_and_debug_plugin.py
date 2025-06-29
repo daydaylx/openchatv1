@@ -1,3 +1,5 @@
+# plugins/refinement_and_debug_plugin.py
+
 import sys
 import logging
 from plugin_interface import ChatPlugin
@@ -5,7 +7,6 @@ from PySide6.QtWidgets import QMenu, QInputDialog, QTextBrowser, QLineEdit, QMes
 from PySide6.QtGui import QAction
 from PySide6.QtCore import Qt
 
-# Logger für dieses Plugin-Modul initialisieren
 logger = logging.getLogger(__name__)
 
 class AdvancedTextBrowser(QTextBrowser):
@@ -52,6 +53,7 @@ class AdvancedTextBrowser(QTextBrowser):
         
         if editor_plugin:
             try:
+                # Die open_editor Methode wird direkt auf der Plugin-Instanz aufgerufen
                 editor_plugin.open_editor(initial_content=code_snippet, initial_title="Debug Snippet")
             except Exception as e:
                 QMessageBox.critical(self, "Fehler", f"Fehler beim Öffnen des Editors: {e}")
@@ -73,20 +75,28 @@ class RefinementAndDebugPlugin(ChatPlugin):
     def __init__(self, main_window):
         super().__init__(main_window)
         try:
-            # Navigation durch das Layout, um das Widget zu finden und zu ersetzen
-            chat_panes_layout = self.main_window.chat.layout().itemAt(0)
-            if not chat_panes_layout: return
-            assistant_pane_layout = chat_panes_layout.itemAt(1)
-            if not assistant_pane_layout: return
-            
-            old_browser = self.main_window.chat.assistant_view
+            # --- START: GEÄNDERTER CODE FÜR NEUES LAYOUT ---
+            # Wir greifen auf das Hauptlayout des Chat-Widgets zu, das wir in V14 zugänglich gemacht haben
+            chat_widget_layout = self.main_window.chat.layout()
+            if not chat_widget_layout: return
+
+            # Finde den alten Browser im Layout
+            old_browser = self.main_window.chat.chat_view
             if not old_browser: return
             
+            # Erstelle den neuen Browser
             new_browser = AdvancedTextBrowser(self.main_window)
-            assistant_pane_layout.replaceWidget(old_browser, new_browser)
+            
+            # Ersetze das Widget im Layout
+            chat_widget_layout.replaceWidget(old_browser, new_browser)
+            
+            # Lösche das alte Widget sicher
             old_browser.deleteLater()
             
-            self.main_window.chat.assistant_view = new_browser
-            logger.info("Interaktions-Helfer: Assistant-Ansicht erfolgreich für Kontextmenü ersetzt.")
+            # Aktualisiere die Referenzen im Chat-Widget und im Hauptfenster
+            self.main_window.chat.chat_view = new_browser
+            self.main_window.chat.assistant_view = new_browser # Für Kompatibilität
+            logger.info("Interaktions-Helfer: Chat-Ansicht erfolgreich für Kontextmenü ersetzt.")
+            # --- ENDE: GEÄNDERTER CODE ---
         except Exception as e:
             logger.error(f"Fehler bei der Initialisierung des Interaktions-Helfer-Plugins: {e}", exc_info=True)
