@@ -1,10 +1,12 @@
-# plugins/refinement_and_debug_plugin.py
-
 import sys
-from plugin_interface import ChatPlugin, Message
+import logging
+from plugin_interface import ChatPlugin
 from PySide6.QtWidgets import QMenu, QInputDialog, QTextBrowser, QLineEdit, QMessageBox
-from PySide6.QtGui import QAction, QContextMenuEvent
+from PySide6.QtGui import QAction
 from PySide6.QtCore import Qt
+
+# Logger für dieses Plugin-Modul initialisieren
+logger = logging.getLogger(__name__)
 
 class AdvancedTextBrowser(QTextBrowser):
     """
@@ -26,12 +28,10 @@ class AdvancedTextBrowser(QTextBrowser):
         if selected_text:
             menu.addSeparator()
             
-            # Aktion 1: Code verfeinern
             refine_action = QAction("Markierung verfeinern...", self)
             refine_action.triggered.connect(lambda: self.refine_code(selected_text))
             menu.addAction(refine_action)
             
-            # Aktion 2: Code im Editor zum Debuggen öffnen
             debug_action = QAction("Markierung im Editor debuggen...", self)
             debug_action.triggered.connect(lambda: self.debug_in_editor(selected_text))
             menu.addAction(debug_action)
@@ -48,17 +48,10 @@ class AdvancedTextBrowser(QTextBrowser):
 
     def debug_in_editor(self, code_snippet: str):
         """Findet das Code-Editor-Plugin und übergibt den Code-Schnipsel."""
-        editor_plugin = None
-        # Suche nach dem Editor-Plugin im PluginManager
-        for plugin in self.main_window.plugin_manager.plugins:
-            # Wir suchen flexibel nach dem Namen, falls der Nutzer ihn ändert.
-            if "Code Editor" in plugin.get_name():
-                editor_plugin = plugin
-                break
+        editor_plugin = next((p for p in self.main_window.plugin_manager.plugins if "Code Editor" in p.get_name()), None)
         
         if editor_plugin:
             try:
-                # Rufe die (modifizierte) open_editor Methode auf und übergebe den Code
                 editor_plugin.open_editor(initial_content=code_snippet, initial_title="Debug Snippet")
             except Exception as e:
                 QMessageBox.critical(self, "Fehler", f"Fehler beim Öffnen des Editors: {e}")
@@ -80,6 +73,7 @@ class RefinementAndDebugPlugin(ChatPlugin):
     def __init__(self, main_window):
         super().__init__(main_window)
         try:
+            # Navigation durch das Layout, um das Widget zu finden und zu ersetzen
             chat_panes_layout = self.main_window.chat.layout().itemAt(0)
             if not chat_panes_layout: return
             assistant_pane_layout = chat_panes_layout.itemAt(1)
@@ -93,8 +87,6 @@ class RefinementAndDebugPlugin(ChatPlugin):
             old_browser.deleteLater()
             
             self.main_window.chat.assistant_view = new_browser
-            print("RefinementAndDebugPlugin: Assistant-Ansicht erfolgreich für Kontextmenü ersetzt.")
+            logger.info("Interaktions-Helfer: Assistant-Ansicht erfolgreich für Kontextmenü ersetzt.")
         except Exception as e:
-            print(f"Fehler im RefinementAndDebugPlugin: {e}", file=sys.stderr)
-
-
+            logger.error(f"Fehler bei der Initialisierung des Interaktions-Helfer-Plugins: {e}", exc_info=True)
