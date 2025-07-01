@@ -23,9 +23,9 @@ fi
 echo "   -> Committe Änderungen mit der Nachricht: '$commit_message'"
 git commit -m "$commit_message"
 
-# 4. Die Änderungen auf GitHub pushen (zum 'master' Branch)
-echo "   -> Lade Änderungen zu GitHub hoch (git push origin master)"
-# --- KORRIGIERTE ZEILE ---
-git push origin master
+# 4. Die Änderungen auf GitHub pushen (zum 'main' Branch)
+echo "   -> Lade Änderungen zu GitHub hoch (git push origin main)"
+# --- HIER IST DIE KORREKTUR ---
+git push origin main
 
 echo "✅ Prozess abgeschlossen. Deine Änderungen sind jetzt auf GitHub!"
