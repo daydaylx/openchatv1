@@ -1,0 +1,14 @@
+# UI-Framework
+PySide6
+Pygments
+
+# Backend & API
+httpx
+python-dotenv
+toml
+pydantic
+tenacity
+
+# Werkzeuge & Plugins
+flake8
+PyPDF2
