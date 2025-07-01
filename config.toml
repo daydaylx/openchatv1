@@ -1,0 +1,23 @@
+[api]
+base_url = "https://openrouter.ai/api/v1"
+default_model = "gryphe/mythomax-l2-13b"
+# Weitere Modelle als Liste
+available_models = [
+    "gryphe/mythomax-l2-13b",
+    "mistralai/mistral-7b-instruct",
+    "google/gemma-7b-it",
+    "openchat/openchat-7b"
+]
+
+[prompts]
+system_prompt = "Du bist ein hilfreicher Assistent."
+
+[gui]
+title = "OpenChat v2"
+theme = "soft"
+default_temperature = 0.7
+max_output_tokens = 1024
+
+[logging]
+level = "INFO" # Kann DEBUG, INFO, WARNING, ERROR, CRITICAL sein
+file_path = "app.log"

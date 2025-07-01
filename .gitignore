@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtuelle Umgebung (venv)
+.venv
+venv/
+ENV/
+
+# Konfiguration für sensible Daten
+.env
+
+# Log-Dateien
+*.log
+
+# IDE-spezifische Ordner
+.idea/
+.vscode/

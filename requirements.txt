@@ -1,0 +1,6 @@
+gradio
+httpx
+python-dotenv
+toml
+pydantic
+tenacity
